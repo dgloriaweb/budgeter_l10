@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
@@ -42,4 +43,25 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\MailResetPasswordNotification($token));
+    }
+
+    /*** relationships */
+    public static function getUserById($userId)
+    {
+        return User::where('id', $userId)->first();
+    }
+
+    public function Mileages(): HasMany
+    {
+        return $this->hasMany(Mileage::class);
+    }
+
+    public function Partners()
+    {
+        return $this->belongsToMany(Partner::class, 'user_partner');
+    }
 }
