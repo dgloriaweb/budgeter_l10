@@ -16,12 +16,11 @@ class GmapsService
 
     public function getNearbyPlaces($location, $radius, $keyword)
     {
-        $url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={$location}&radius={$radius}&keyword={$keyword}&key={$this->apiKey}";
-        Log::debug($this->apiKey);
-
+        $url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={$location}&radius={$radius}&keyword={$keyword}&maxResultCount=2&key={$this->apiKey}";
+        
         try {
             $response = Http::get($url);
-            Log::debug($response);
+            // Log::debug($response);
             return $response->json();
         } catch (\Exception $e) {
             // Handle errors, log, etc.
@@ -33,6 +32,7 @@ class GmapsService
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=place_id:{$destinationPlaceId}&origins={$location}&key={$this->apiKey}";
         try {
             $response = Http::get($url);
+            // Log::debug($response);
             return $response->json();
         } catch (\Exception $e) {
             // Handle errors, log, etc.

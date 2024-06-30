@@ -24,12 +24,19 @@ class GoogleMapsController extends Controller
         $combinedPlaces = [];
 
         foreach ($keywords as $keyword) {
+
+            // for each keyword max required result can be 3 not more
             $places = $this->gmapsService->getNearbyPlaces($location, $radius, $keyword);
 
             // Add distance data to each place
-            foreach ($places['results'] as &$place) {
+            foreach ($places['results'] as $key => &$place) {
                 $distanceData = $this->gmapsService->getPlaceDistances($place['place_id'], $location);
-                $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
+                // filter out empty distance data elements
+                if (!$distanceData['rows'][0]['elements'][0]['distance']['text']) {
+                    unset($places['results'][$key]);
+                } else {
+                    $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'];
+                }
             }
 
             // Merge the results into the combined array
