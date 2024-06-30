@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class GmapsService
 {
@@ -16,9 +17,11 @@ class GmapsService
     public function getNearbyPlaces($location, $radius, $keyword)
     {
         $url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={$location}&radius={$radius}&keyword={$keyword}&key={$this->apiKey}";
+        Log::debug($this->apiKey);
 
         try {
             $response = Http::get($url);
+            Log::debug($response);
             return $response->json();
         } catch (\Exception $e) {
             // Handle errors, log, etc.
