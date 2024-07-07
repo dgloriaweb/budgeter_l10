@@ -40,11 +40,11 @@ class GoogleMapsController extends Controller
                 $combinedPlaces = array_merge($combinedPlaces, $places['results']);
             }
         } else {
-            $type = "meal_delivery"; // change this to the below request to find all that has food delivery
+            $type = "delivery"; // change this to the below request to find all that has food delivery
             // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&place_id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
 
 
-            $places = $this->gmapsService->getNearbyPlaces($location, $radius, "type", $type);
+            $places = $this->gmapsService->getNearbyPlaces($location, $radius, "keyword", $type);
 
             // Add distance data to each place
             foreach ($places['results'] as &$place) {
