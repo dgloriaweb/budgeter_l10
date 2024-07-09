@@ -14,7 +14,7 @@ class GoogleMapsController extends Controller
         $this->gmapsService = $gmapsService;
     }
 
-    public function getNearbyPlacesControl(Request $request)
+    public function getNearbyPlacesOldControl(Request $request)
     {
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
@@ -28,7 +28,7 @@ class GoogleMapsController extends Controller
             $keywords = ["mcdonalds", "asda", "sainsburys", "costa"];
 
             foreach ($keywords as $keyword) {
-                $places = $this->gmapsService->getNearbyPlaces($location, $radius, "keyword", $keyword);
+                $places = $this->gmapsService->getNearbyPlacesOld($location, $radius, "keyword", $keyword);
 
                 // Add distance data to each place
                 foreach ($places['results'] as &$place) {
@@ -44,7 +44,7 @@ class GoogleMapsController extends Controller
             // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&place_id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
 
 
-            $places = $this->gmapsService->getNearbyPlaces($location, $radius, "keyword", $type);
+            $places = $this->gmapsService->getNearbyPlacesOld($location, $radius, "keyword", $type);
 
             // Add distance data to each place
             foreach ($places['results'] as &$place) {
@@ -119,5 +119,17 @@ class GoogleMapsController extends Controller
         }
 
         return 0; // Default to 0 if distance format is unexpected
+    }
+    public function getNearbyPlacesControl(Request $request)
+    {
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        $radius = $request->input('radius', 500);
+        $type = $request->input('includedTypes');
+
+        $places = $this->gmapsService->getNearbyPlaces($latitude, $longitude, $radius, $type);
+
+        // Return the filtered places
+        return response()->json(['results' => $places]);
     }
 }

@@ -96,7 +96,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/register', 'App\Http\Controllers\Auth\ApiAuthController@register')->name('register.api');
     Route::post('/resetPassword', 'App\Http\Controllers\Auth\ResetPasswordController@resetPassword')->name('resetPassword.api');
     Route::get('/getNearbyPlaces', 'App\Http\Controllers\GoogleMapsController@getNearbyPlacesControl')->name('gmaps.api.getnearbyplacescontrol');
-  
+    
 
     //test routes
     Route::post('/books', 'App\Http\Controllers\Tests\BookController@store');
