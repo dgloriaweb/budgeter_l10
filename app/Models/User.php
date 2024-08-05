@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'patreon_code',
+        'patreon_expiry_date',
+        'patreon_daily_counter'
     ];
 
     /**

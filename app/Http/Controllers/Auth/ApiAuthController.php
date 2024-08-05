@@ -53,7 +53,11 @@ class ApiAuthController extends Controller
                 return response([
                     'token' => $token,
                     'userId' => $user->id,
-                    'successMessage' => "User successfully logged in"
+                    'successMessage' => "User successfully logged in",
+                    'patreon_code' => $user->patreon_code,
+                    'patreon_expiry_date' => $user->patreon_expiry_date,
+                    'patreon_daily_counter' => $user->patreon_daily_counter,
+
                 ], 200);
             } else {
                 return response(['errors' => "Password mismatch"], 422);
