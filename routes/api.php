@@ -87,16 +87,12 @@ Route::get('/email/verify/{id}/{hash}', 'App\Http\Controllers\Auth\ApiAuthContro
 
 Route::group(['middleware' => ['cors', 'json.response']], function () {
 
-    //patreon api
-    Route::get('/patreon', 'App\Http\Controllers\PatreonController@index');
-
-
     // public routes
     Route::post('/login', 'App\Http\Controllers\Auth\ApiAuthController@login')->name('login.api');
     Route::post('/register', 'App\Http\Controllers\Auth\ApiAuthController@register')->name('register.api');
     Route::post('/resetPassword', 'App\Http\Controllers\Auth\ResetPasswordController@resetPassword')->name('resetPassword.api');
     Route::get('/getNearbyPlaces', 'App\Http\Controllers\GoogleMapsController@getNearbyPlacesControl')->name('gmaps.api.getnearbyplacescontrol');
-  
+
 
     //test routes
     Route::post('/books', 'App\Http\Controllers\Tests\BookController@store');
@@ -128,4 +124,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/getuserpartners/{user_id}', 'App\Http\Controllers\UserPartnerController@getuserpartners')->name('getuserpartners');
     Route::post('/userpartner', 'App\Http\Controllers\UserPartnerController@update')->name('setuserpartner');
     // Route::post('/enableuserpartner/{partner_id}', 'App\Http\Controllers\UserPartnerController@enable')->name('enableuserpartner');
+
+    //patreon api
+    Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCode');
 });

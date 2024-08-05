@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Patreon;
 use Illuminate\Http\Request;
 use App\Services\PatreonService;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Http;
 
 class PatreonController extends Controller
@@ -95,10 +96,27 @@ class PatreonController extends Controller
         }
         return response(200);
     }
-    
+
     //TODO: implement code for emailing me if cron response is not 200
     public function sendErrorEmail()
     {
         // send me error email: there was an issue in the api response. Please check
+    }
+
+
+    /**
+     * V2 code starts here, delete above if this works
+     * 
+     */
+    public function getCode()
+    {
+        // Construct the URL for Patreon OAuth
+        $client_id = env('PATREON_CLIENT_ID');
+        $redirect_uri = env('PATREON_REDIRECT_URI');
+
+        // Construct the URL with the environment variables
+        $url = "https://www.patreon.com/oauth2/authorize?response_type=code&client_id=$client_id&redirect_uri=$redirect_uri";
+
+        return redirect($url);
     }
 }
