@@ -99,6 +99,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/books/{id}', 'App\Http\Controllers\Tests\BookController@update');
 
     // patreon without auth
+    Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCode');
     Route::get('/patreon', 'App\Http\Controllers\PatreonController@redirect');
 
 
@@ -127,6 +128,4 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/userpartner', 'App\Http\Controllers\UserPartnerController@update')->name('setuserpartner');
     // Route::post('/enableuserpartner/{partner_id}', 'App\Http\Controllers\UserPartnerController@enable')->name('enableuserpartner');
 
-    //patreon api
-    Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCode');
 });
