@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Patreon;
 use Illuminate\Http\Request;
 use App\Services\PatreonService;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Http;
 
@@ -118,5 +119,9 @@ class PatreonController extends Controller
         $url = "https://www.patreon.com/oauth2/authorize?response_type=code&client_id=$client_id&redirect_uri=$redirect_uri";
 
         return redirect($url);
+    }
+    public function redirect(Request $request, Response $response)
+    {
+        dd($response);
     }
 }
