@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // 
-            $table->string('patreon_code');
+            $table->string('patreon_code')->nullable();
             $table->timestamp('patreon_expiry_date')->nullable();
-            $table->tinyInteger('patreon_daily_counter');
+            $table->tinyInteger('patreon_daily_counter')->nullable();
 
         });
     }
