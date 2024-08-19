@@ -8,17 +8,25 @@ use Illuminate\Support\Facades\Http;
 
 class PatreonService
 {
-    protected $patreon;
+  protected $patreon;
+  protected $client_id;
+  protected $redirect_uri;
 
 
-    public function getPatrons()
-    {
-        // this is used by the patreoncontroller getPatrons function
+  public function __construct()
+  {
+    $this->client_id = config('services.patreon.client_id');
+    $this->redirect_uri = config('services.patreon.redirect_uri');
+  }
 
-        $response = Http::withToken(env('PATREON_TEMP_BEARER'))->get("https://www.patreon.com/api/oauth2/api/campaigns/11120253/pledges?include=patron.null");
-        return $response->json();
+  public function getPatrons()
+  {
+    // this is used by the patreoncontroller getPatrons function
 
-        /* 
+    $response = Http::withToken(env('PATREON_TEMP_BEARER'))->get("https://www.patreon.com/api/oauth2/api/campaigns/11120253/pledges?include=patron.null");
+    return $response->json();
+
+    /* 
     response looks like this:<pre>array(4) {
   ["data"]=>
   array(1) {
@@ -152,5 +160,5 @@ class PatreonService
 }
 </pre>
 */
-    }
+  }
 }

@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Http;
 
 class PatreonController extends Controller
 {
+    protected $patreonService;
+
+    public function __construct(PatreonService $patreonService)
+    {
+        $this->patreonService = $patreonService;
+    }
+
     // Todo: make a service to run the code to connect to the api
     // https://www.patreon.com/oauth2/authorize?response_type=code&client_id=env("PATREON_CLIENT_ID")&redirect_uri=env("PATREON_REDIRECT_URI")
 
@@ -109,19 +116,12 @@ class PatreonController extends Controller
      * V2 code starts here, delete above if this works
      * 
      */
-    public function getCode()
+    public function getCodeControl()
     {
-        // Construct the URL for Patreon OAuth
-        $client_id = env('PATREON_CLIENT_ID');
-        $redirect_uri = env('PATREON_REDIRECT_URI');
+        $client_id = config('services.patreon.client_id');
+        $redirect_uri = config('services.patreon.redirect_uri');
 
-        // Construct the URL with the environment variables
         $url = "https://www.patreon.com/oauth2/authorize?response_type=code&client_id=$client_id&redirect_uri=$redirect_uri";
-
         return redirect($url);
-    }
-    public function redirect(Request $request, Response $response)
-    {
-        dd($response);
     }
 }

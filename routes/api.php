@@ -99,7 +99,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/books/{id}', 'App\Http\Controllers\Tests\BookController@update');
 
     // patreon without auth
-    Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCode');
+    Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCodeControl');
     Route::get('/patreon', 'App\Http\Controllers\PatreonController@redirect');
 
 
