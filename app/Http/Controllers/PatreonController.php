@@ -124,4 +124,27 @@ class PatreonController extends Controller
         $url = "https://www.patreon.com/oauth2/authorize?response_type=code&client_id=$client_id&redirect_uri=$redirect_uri";
         return redirect($url);
     }
+
+    public function patreonStoreCode(Request $request)
+    {
+        $validated = $request->validate([
+            'patreonCode' => 'required|string|min:5|max:255',
+            'userId'   => 'required|integer'
+        ]);
+        // Find the user by id
+        $user = \App\Models\User::findOrFail($validated['userId']);
+
+        // create the expiry date for the code
+        $expiry_date = new \DateTime();  // Create a DateTime object with the current date and time
+        $expiry_date->modify('+30 days');  // Add 30 days to the current date
+
+        // Add the expiry date to the validated data collection
+        $validated['patreon_expiry_date'] = $expiry_date->format('Y-m-d'); // or 'Y-m-d H:i:s' if you need the time too
+
+        // Update the patreon_code for the found user
+        $user->update([
+            'patreon_code' => $validated['patreonCode'],
+            'patreon_expiry_date' => $validated['patreon_expiry_date'],
+        ]);
+    }
 }

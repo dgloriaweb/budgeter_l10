@@ -101,6 +101,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // patreon without auth
     Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCodeControl');
     Route::get('/patreon', 'App\Http\Controllers\PatreonController@redirect');
+    Route::post('/patreonStoreCode', 'App\Http\Controllers\PatreonController@patreonStoreCode');
 
 
     // Our protected routes, on the other hand, look like this:
