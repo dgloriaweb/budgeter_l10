@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partner;
+use App\Models\User;
 use App\Models\UserPartner;
 use Illuminate\Http\Request;
 
@@ -56,8 +57,8 @@ class UserPartnerController extends Controller
      */
     public function getuserpartners($user_id)
     {
-        $dataById = UserPartner::with('partner')->where('user_id', $user_id)
-            ->whereHas('partner', function ($query) {
+        $dataById = User::with('partners')->where('user_id', $user_id)
+            ->whereHas('partners', function ($query) {
                 $query->where('enabled', 1);
             })
             ->get();
