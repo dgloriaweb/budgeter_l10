@@ -128,11 +128,11 @@ class PatreonController extends Controller
     public function patreonStoreCode(Request $request)
     {
         $validated = $request->validate([
-            'patreonCode' => 'required|string|min:5|max:255',
-            'userId'   => 'required|integer'
+            'patreonCode' => 'required|string|min:5|max:255'
         ]);
-        // Find the user by id
-        $user = \App\Models\User::findOrFail($validated['userId']);
+        
+        // Get the authenticated user
+        $user = $request->user();  // or use Auth::user();
 
         // create the expiry date for the code
         $expiry_date = new \DateTime();  // Create a DateTime object with the current date and time

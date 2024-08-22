@@ -101,14 +101,14 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // patreon without auth
     Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCodeControl');
     Route::get('/patreon', 'App\Http\Controllers\PatreonController@redirect');
-    Route::post('/patreonStoreCode', 'App\Http\Controllers\PatreonController@patreonStoreCode');
-
+ 
 
     // Our protected routes, on the other hand, look like this:
     Route::middleware('auth:api')->group(function () {
         // our routes to be protected will go in here
         Route::post('/logout', 'App\Http\Controllers\Auth\ApiAuthController@logout')->name('logout.api');
         Route::get('/patreonupdate', 'App\Http\Controllers\PatreonController@getPatrons')->name('patreonupdate');
+        Route::post('/patreonStoreCode', 'App\Http\Controllers\PatreonController@patreonStoreCode');
     });
 });
 Route::middleware('auth:api')->group(function () {
