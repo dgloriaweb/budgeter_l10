@@ -57,7 +57,7 @@ class UserPartnerController extends Controller
      */
     public function getuserpartners($user_id)
     {
-        $dataById = User::with('partners')
+        $dataById = User::with('partners')->where('id', $user_id)
             ->whereHas('partners', function ($query) {
                 $query->where('enabled', 1);
             })
