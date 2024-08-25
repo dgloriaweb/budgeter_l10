@@ -67,6 +67,15 @@ class GoogleMapsController extends Controller
             return $distanceA <=> $distanceB;
         });
 
+
+        // increase the counter for the user
+        $user = $request->user();
+        $counter =  $user->patreon_deaily_counter;
+        $counter++;
+        $user->update([
+            'counter' => $counter,
+        ]);
+
         // Return the filtered places
         return response()->json(['results' => $filteredPlaces]);
     }

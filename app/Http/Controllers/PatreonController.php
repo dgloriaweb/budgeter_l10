@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patreon;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\PatreonService;
 use GuzzleHttp\Psr7\Response;
@@ -128,9 +129,9 @@ class PatreonController extends Controller
     public function patreonStoreCode(Request $request)
     {
         $validated = $request->validate([
-            'patreonCode' => 'required|string|min:5|max:255'
+            'code' => 'required|string|min:5|max:255'
         ]);
-        
+
         // Get the authenticated user
         $user = $request->user();  // or use Auth::user();
 
@@ -143,8 +144,15 @@ class PatreonController extends Controller
 
         // Update the patreon_code for the found user
         $user->update([
-            'patreon_code' => $validated['patreonCode'],
+            'patreon_code' => $validated['code'],
             'patreon_expiry_date' => $validated['patreon_expiry_date'],
         ]);
+    }
+    public function resetPatreonCounter()
+    {
+        User::whereNotNull('patreon_code')
+            ->where('patreon_code', '!=', '')
+            ->where('patreon_daily_counter', 5)
+            ->update(['patreon_daily_counter' => 0]);
     }
 }
