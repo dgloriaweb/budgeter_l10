@@ -69,12 +69,16 @@ class GoogleMapsController extends Controller
 
 
         // increase the counter for the user
+        // move this higher up, don't do the request if the value is already 5
+        dd($request->user());
         $user = $request->user();
-        $counter =  $user->patreon_deaily_counter;
-        $counter++;
-        $user->update([
-            'counter' => $counter,
-        ]);
+        if ($user) {
+            $counter =  $user->patreon_daily_counter;
+            $counter++;
+            $user->update([
+                'patreon_daily_counter' => $counter,
+            ]);
+        } 
 
         // Return the filtered places
         return response()->json(['results' => $filteredPlaces]);

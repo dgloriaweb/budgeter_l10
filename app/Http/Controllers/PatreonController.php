@@ -152,7 +152,7 @@ class PatreonController extends Controller
     {
         User::whereNotNull('patreon_code')
             ->where('patreon_code', '!=', '')
-            ->where('patreon_daily_counter', 5)
+            ->where('patreon_daily_counter', '>' ,0)
             ->update(['patreon_daily_counter' => 0]);
     }
 }
