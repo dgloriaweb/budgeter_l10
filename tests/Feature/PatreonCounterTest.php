@@ -18,7 +18,8 @@ class testResettingPatreonCounter extends TestCase
         // find all users in the list that has the patreon counter on 5
         $users =  User::whereNotNull('patreon_code')
             ->where('patreon_code', '!=', '')
-            ->where('patreon_daily_counter', 5);
+            ->where('patreon_daily_counter', 5)
+            ->get();
 
         $patreonService = new PatreonService();
         $patreonController = new PatreonController($patreonService);
@@ -27,7 +28,8 @@ class testResettingPatreonCounter extends TestCase
         // assert that the list is now empty
         $users =  User::whereNotNull('patreon_code')
             ->where('patreon_code', '!=', '')
-            ->where('patreon_daily_counter', 5);
+            ->where('patreon_daily_counter', 5)
+            ->get();
         $this->assertEmpty($users);
     }
 }
