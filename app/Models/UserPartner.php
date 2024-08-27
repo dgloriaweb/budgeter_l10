@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class UserPartner extends Model
 {
     use HasFactory;
+    
+    // Explicitly define the table name
+    protected $table = 'user_partner';
 
     protected $fillable = [
         'user_id',

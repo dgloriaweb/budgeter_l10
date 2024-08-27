@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\GmapsService;
 use Illuminate\Http\Request;
 
@@ -70,8 +71,8 @@ class GoogleMapsController extends Controller
 
         // increase the counter for the user
         // move this higher up, don't do the request if the value is already 5
-        dd($request->user());
-        $user = $request->user();
+        // dd($request->user());
+        $user = User::where('id', $request->user->userId)->first();
         if ($user) {
             $counter =  $user->patreon_daily_counter;
             $counter++;

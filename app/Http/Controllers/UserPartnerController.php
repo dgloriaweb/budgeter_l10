@@ -86,17 +86,21 @@ class UserPartnerController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|integer',
             'partner_id' => 'required|integer',
             'enabled' => 'required|integer'
         ]);
-        $userpartner =  UserPartner::where('user_id', $request->user_id)
+        // Get the authenticated user
+        $user = auth()->user(); // or $user = Auth::user();
+
+        $userpartner =  UserPartner::where('user_id', $user->id)
             ->where('partner_id', $request->partner_id)
             ->first();
+
+
         // if there is a result, update the enabled to 1
         if ($userpartner) {
             $userpartner->enabled = 1;
-            $userpartner->save();
+            $userpartner->update();
         }
         // if it doesn't exist, create it
         else {
