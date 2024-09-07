@@ -17,6 +17,9 @@ class GoogleMapsController extends Controller
 
     public function getNearbyPlacesControl(Request $request)
     {
+        // Get the authenticated user
+        $user = auth()->user(); // or $user = Auth::user();
+
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
         $radius = $request->input('radius', 2500);
@@ -71,18 +74,20 @@ class GoogleMapsController extends Controller
 
         // increase the counter for the user
         // move this higher up, don't do the request if the value is already 5
-        // dd($request->user());
-        $user = User::where('id', $request->user->userId)->first();
-        if ($user) {
-            $counter =  $user->patreon_daily_counter;
-            $counter++;
-            $user->update([
-                'patreon_daily_counter' => $counter,
-            ]);
-        } 
+        $counter =  $user->patreon_daily_counter;
+        $counter++;
+        $user->update([
+            'patreon_daily_counter' => $counter,
+        ]);
 
         // Return the filtered places
-        return response()->json(['results' => $filteredPlaces]);
+        // Return the updated user data
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User updated successfully',
+            'user' => $user, // Return the updated user
+            'results' => $filteredPlaces
+        ]);
     }
 
     private function removeDuplicates($placesArray)

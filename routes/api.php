@@ -91,8 +91,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/login', 'App\Http\Controllers\Auth\ApiAuthController@login')->name('login.api');
     Route::post('/register', 'App\Http\Controllers\Auth\ApiAuthController@register')->name('register.api');
     Route::post('/resetPassword', 'App\Http\Controllers\Auth\ResetPasswordController@resetPassword')->name('resetPassword.api');
-    Route::get('/getNearbyPlaces', 'App\Http\Controllers\GoogleMapsController@getNearbyPlacesControl')->name('gmaps.api.getnearbyplacescontrol');
-
+ 
 
     //test routes
     Route::post('/books', 'App\Http\Controllers\Tests\BookController@store');
@@ -109,6 +108,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
         Route::post('/logout', 'App\Http\Controllers\Auth\ApiAuthController@logout')->name('logout.api');
         Route::get('/patreonupdate', 'App\Http\Controllers\PatreonController@getPatrons')->name('patreonupdate');
         Route::post('/patreonStoreCode', 'App\Http\Controllers\PatreonController@patreonStoreCode');
+        Route::get('/getNearbyPlaces', 'App\Http\Controllers\GoogleMapsController@getNearbyPlacesControl')->name('gmaps.api.getnearbyplacescontrol');
     });
 });
 Route::middleware('auth:api')->group(function () {
