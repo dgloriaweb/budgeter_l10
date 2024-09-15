@@ -9,6 +9,7 @@ use App\Services\PatreonService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PatreonController extends Controller
 {
@@ -152,7 +153,9 @@ class PatreonController extends Controller
     {
         User::whereNotNull('patreon_code')
             ->where('patreon_code', '!=', '')
-            ->where('patreon_daily_counter', '>' ,0)
+            ->where('patreon_daily_counter', '>', 0)
             ->update(['patreon_daily_counter' => 0]);
+        // Log a message to verify the method is being called
+        Log::info('resetPatreonCounter method is being executed.');
     }
 }
