@@ -71,23 +71,26 @@ class GoogleMapsController extends Controller
             return $distanceA <=> $distanceB;
         });
 
+        if ($user instanceof User) {
+            // increase the counter for the user
+            // move this higher up, don't do the request if the value is already 5
+            $counter =  $user->patreon_daily_counter;
+            $counter++;
+            $user->update([
+                'patreon_daily_counter' => $counter,
+            ]);
 
-        // increase the counter for the user
-        // move this higher up, don't do the request if the value is already 5
-        $counter =  $user->patreon_daily_counter;
-        $counter++;
-        $user->update([
-            'patreon_daily_counter' => $counter,
-        ]);
-
-        // Return the filtered places
-        // Return the updated user data
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User updated successfully',
-            'user' => $user, // Return the updated user
-            'results' => $filteredPlaces
-        ]);
+            // Return the filtered places
+            // Return the updated user data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User updated successfully',
+                'userCounter' => $counter, // Return the updated user
+                'results' => $filteredPlaces
+            ]);
+        } else {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
     }
 
     private function removeDuplicates($placesArray)
