@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->call('App\Http\Controllers\PatreonController@resetPatreonCounter')->dailyat('2:00');
+        $schedule->call('App\Http\Controllers\PatreonController@resetPatreonCounter')->dailyat('8:45');
     }
 
     /**
