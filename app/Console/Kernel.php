@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         // $schedule->call('App\Http\Controllers\PatreonController@getPatrons')->everyHour();
-        $schedule->call('App\Http\Controllers\PatreonController@resetPatreonCounter')->dailyat('9:26');
+        $schedule->call('App\Http\Controllers\PatreonController@resetPatreonCounter')->dailyat('8:29');
 
     }
 
