@@ -3,12 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patreon;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\PatreonService;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PatreonController extends Controller
 {
+    protected $patreonService;
+
+    public function __construct(PatreonService $patreonService)
+    {
+        $this->patreonService = $patreonService;
+    }
+
     // Todo: make a service to run the code to connect to the api
     // https://www.patreon.com/oauth2/authorize?response_type=code&client_id=env("PATREON_CLIENT_ID")&redirect_uri=env("PATREON_REDIRECT_URI")
 
@@ -95,10 +106,56 @@ class PatreonController extends Controller
         }
         return response(200);
     }
-    
+
     //TODO: implement code for emailing me if cron response is not 200
     public function sendErrorEmail()
     {
         // send me error email: there was an issue in the api response. Please check
+    }
+
+
+    /**
+     * V2 code starts here, delete above if this works
+     * 
+     */
+    public function getCodeControl()
+    {
+        $client_id = config('services.patreon.client_id');
+        $redirect_uri = config('services.patreon.redirect_uri');
+
+        $url = "https://www.patreon.com/oauth2/authorize?response_type=code&client_id=$client_id&redirect_uri=$redirect_uri";
+        return redirect($url);
+    }
+
+    public function patreonStoreCode(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|min:5|max:255'
+        ]);
+
+        // Get the authenticated user
+        $user = $request->user();  // or use Auth::user();
+
+        // create the expiry date for the code
+        $expiry_date = new \DateTime();  // Create a DateTime object with the current date and time
+        $expiry_date->modify('+30 days');  // Add 30 days to the current date
+
+        // Add the expiry date to the validated data collection
+        $validated['patreon_expiry_date'] = $expiry_date->format('Y-m-d'); // or 'Y-m-d H:i:s' if you need the time too
+
+        // Update the patreon_code for the found user
+        $user->update([
+            'patreon_code' => $validated['code'],
+            'patreon_expiry_date' => $validated['patreon_expiry_date'],
+        ]);
+    }
+    public function resetPatreonCounter()
+    {
+        User::whereNotNull('patreon_code')
+            ->where('patreon_code', '!=', '')
+            ->where('patreon_daily_counter', '>', 0)
+            ->update(['patreon_daily_counter' => 0]);
+        // Log a message to verify the method is being called
+        Log::info('resetPatreonCounter method is being executed.');
     }
 }

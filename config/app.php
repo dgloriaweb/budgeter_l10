@@ -185,4 +185,11 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    /** 
+     * settings for the site
+     */
+    'site_settings' => [
+        'patreon_daily_counter' => 5
+    ],
+
 ];

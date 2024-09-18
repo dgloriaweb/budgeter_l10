@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\GmapsService;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,9 @@ class GoogleMapsController extends Controller
 
     public function getNearbyPlacesOldControl(Request $request)
     {
+        // Get the authenticated user
+        $user = auth()->user(); // or $user = Auth::user();
+
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
         $radius = $request->input('radius', 2500);
@@ -67,8 +71,26 @@ class GoogleMapsController extends Controller
             return $distanceA <=> $distanceB;
         });
 
-        // Return the filtered places
-        return response()->json(['results' => $filteredPlaces]);
+        if ($user instanceof User) {
+            // increase the counter for the user
+            // move this higher up, don't do the request if the value is already 5
+            $counter =  $user->patreon_daily_counter;
+            $counter++;
+            $user->update([
+                'patreon_daily_counter' => $counter,
+            ]);
+
+            // Return the filtered places
+            // Return the updated user data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User updated successfully',
+                'userCounter' => $counter, // Return the updated user
+                'results' => $filteredPlaces
+            ]);
+        } else {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
     }
 
     private function removeDuplicates($placesArray)

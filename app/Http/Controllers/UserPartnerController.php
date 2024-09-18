@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partner;
+use App\Models\User;
 use App\Models\UserPartner;
 use Illuminate\Http\Request;
 
@@ -56,8 +57,8 @@ class UserPartnerController extends Controller
      */
     public function getuserpartners($user_id)
     {
-        $dataById = UserPartner::with('partner')->where('user_id', $user_id)
-            ->whereHas('partner', function ($query) {
+        $dataById = User::with('partners')->where('id', $user_id)
+            ->whereHas('partners', function ($query) {
                 $query->where('enabled', 1);
             })
             ->get();
@@ -85,17 +86,21 @@ class UserPartnerController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|integer',
             'partner_id' => 'required|integer',
             'enabled' => 'required|integer'
         ]);
-        $userpartner =  UserPartner::where('user_id', $request->user_id)
+        // Get the authenticated user
+        $user = auth()->user(); // or $user = Auth::user();
+
+        $userpartner =  UserPartner::where('user_id', $user->id)
             ->where('partner_id', $request->partner_id)
             ->first();
+
+
         // if there is a result, update the enabled to 1
         if ($userpartner) {
             $userpartner->enabled = 1;
-            $userpartner->save();
+            $userpartner->update();
         }
         // if it doesn't exist, create it
         else {

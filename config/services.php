@@ -33,4 +33,8 @@ return [
     'gmaps' => [
         'api_key' => env('GMAPS_API_KEY'),
     ],
+    'patreon' => [
+        'client_id' => env('PATREON_CLIENT_ID'),
+        'redirect_uri' => env('PATREON_REDIRECT_URI')
+    ]
 ];
