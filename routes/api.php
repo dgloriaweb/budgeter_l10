@@ -27,33 +27,8 @@ use Illuminate\Auth\Events\PasswordReset;
 
 /*** ROUES FROM LARAVEL8 app */
 
-/* password reset */
-//show the form to enter email
-Route::get('/forgot-password', function () {
-    return view('auth.forgot-password');
-})->middleware('guest')->name('password.request');
-
-//process the form and send email
-Route::post('/forgot-password', function (Request $request) {
-    $request->validate(['email' => 'required|email|exists:users,email']);
-
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
-
-    return $status === Password::RESET_LINK_SENT
-        ? back()->with(['status' => __($status)])
-        : back()->withErrors(['email' => __($status)]);
-})->middleware('guest')->name('password.email');
-
-/* after user clicked password reset link */
-// show the password reset form
-Route::get('/reset-password/{token}', function ($token) {
-    return view('auth.reset-password', ['token' => $token]);
-})->middleware('guest')->name('password.reset');
-
 // process the password reset form
-Route::post('/reset-password', function (Request $request) {
+Route::post('/resetPassword', function (Request $request) {
     $request->validate([
         'token' => 'required',
         'email' => 'required|email',
@@ -90,8 +65,10 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // public routes
     Route::post('/login', 'App\Http\Controllers\Auth\ApiAuthController@login')->name('login.api');
     Route::post('/register', 'App\Http\Controllers\Auth\ApiAuthController@register')->name('register.api');
+    Route::post('/forgotPassword', 'App\Http\Controllers\Auth\ResetPasswordController@forgotPassword')->name('forgotPassword.api');
+    Route::get('/resetPassword/{token}', 'App\Http\Controllers\Auth\ResetPasswordController@validateResetToken')->name('validateResetToken.api');
     Route::post('/resetPassword', 'App\Http\Controllers\Auth\ResetPasswordController@resetPassword')->name('resetPassword.api');
- 
+
 
     //test routes
     Route::post('/books', 'App\Http\Controllers\Tests\BookController@store');
@@ -100,7 +77,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // patreon without auth
     Route::get('/patreonInit', 'App\Http\Controllers\PatreonController@getCodeControl');
     Route::get('/patreon', 'App\Http\Controllers\PatreonController@redirect');
- 
+
 
     // Our protected routes, on the other hand, look like this:
     Route::middleware('auth:api')->group(function () {
