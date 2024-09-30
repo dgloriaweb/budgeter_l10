@@ -25,7 +25,7 @@ class MailResetPasswordNotification extends ResetPassword
         parent::__construct($token);
         // parent::__construct($this->token);
         // $this->pageUrl = config('app.url');
-        $this->pageUrl = env('APP_FRONTEND_BASE_URL') . '/resetPassword';
+        $this->pageUrl = env('APP_URL') . '/resetPassword';
             // we can set whatever we want here, or use .env to set environmental variables
     }
 
