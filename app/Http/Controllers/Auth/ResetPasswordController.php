@@ -17,6 +17,7 @@ class ResetPasswordController extends Controller
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
 
+        // todo: make sure email server is running and handle exceptions
         $status = Password::sendResetLink(
             $request->only('email')
         );
@@ -25,17 +26,18 @@ class ResetPasswordController extends Controller
             ? back()->with(['status' => __($status)])
             : back()->withErrors(['email' => __($status)]);
     }
-    protected function validateResetToken($token)
+    protected function validateResetToken(Request $request)
     {
         // Get the base URL from the environment variable
         $frontendUrl = env("APP_FRONTEND_BASE_URL");
+        $email = $request->email;
+        $token = $request->route('token');
 
         // Redirect to the frontend with the token as a query parameter
-        return redirect("{$frontendUrl}/password-reset?token={$token}")->with('message', 'Password reset request recived');
+        return redirect("{$frontendUrl}/password-reset?token={$token}&email=$email")->with('message', 'Password reset request recived');
     }
-    protected function resetPassword(Request $request, $user, $password)
+    protected function resetPassword(Request $request)
     {
-        dd($user);
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',

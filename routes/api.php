@@ -66,7 +66,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/login', 'App\Http\Controllers\Auth\ApiAuthController@login')->name('login.api');
     Route::post('/register', 'App\Http\Controllers\Auth\ApiAuthController@register')->name('register.api');
     Route::post('/forgotPassword', 'App\Http\Controllers\Auth\ResetPasswordController@forgotPassword')->name('forgotPassword.api');
-    Route::get('/resetPassword/{token}', 'App\Http\Controllers\Auth\ResetPasswordController@validateResetToken')->name('validateResetToken.api');
+    Route::get('/resetPassword/{token}/{email}', 'App\Http\Controllers\Auth\ResetPasswordController@validateResetToken')->name('validateResetToken.api');
     Route::post('/resetPassword', 'App\Http\Controllers\Auth\ResetPasswordController@resetPassword')->name('resetPassword.api');
 
 
