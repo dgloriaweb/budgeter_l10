@@ -149,7 +149,17 @@ class GoogleMapsController extends Controller
         $radius = $request->input('radius', 500);
         $type = $request->input('includedTypes');
 
-        $places = $this->gmapsService->getNearbyPlaces($latitude, $longitude, $radius, $type);
+        $places = $this->gmapsService->getNearbyPlaces($latitude, $longitude);
+
+        // Return the filtered places
+        return response()->json(['results' => $places]);
+    }
+    public function getToiletsControl(Request $request)
+    {
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+
+        $places = $this->gmapsService->getToilets($latitude, $longitude);
 
         // Return the filtered places
         return response()->json(['results' => $places]);

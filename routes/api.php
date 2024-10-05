@@ -109,6 +109,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
         Route::get('/patreonupdate', 'App\Http\Controllers\PatreonController@getPatrons')->name('patreonupdate');
         Route::post('/patreonStoreCode', 'App\Http\Controllers\PatreonController@patreonStoreCode');
         Route::get('/getNearbyPlaces', 'App\Http\Controllers\GoogleMapsController@getNearbyPlacesControl')->name('gmaps.api.getnearbyplacescontrol');
+        Route::get('/getToilets', 'App\Http\Controllers\GoogleMapsController@getToiletsControl')->name('gmaps.api.gettoiletscontrol');
     });
 });
 Route::middleware('auth:api')->group(function () {

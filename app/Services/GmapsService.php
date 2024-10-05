@@ -8,10 +8,18 @@ use Illuminate\Support\Facades\Log;
 class GmapsService
 {
     protected $apiKey;
+    protected $headers;
 
     public function __construct()
     {
         $this->apiKey = config('services.gmaps.api_key');
+        $this->headers = [
+            'Accept' => '*/*',
+            'Accept-Encoding' => 'gzip,deflate,br',
+            'Content-Type' => 'application/json',
+            'X-Goog-Api-Key' => $this->apiKey,
+            'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress'
+        ];
     }
 
     public function getNearbyPlacesOld($location, $radius, $paramType, $paramValue)
@@ -39,7 +47,7 @@ class GmapsService
             return ['error' => 'Internal Server Error'];
         }
     }
-    public function getNearbyPlaces()
+    public function getNearbyPlaces($latitude, $longitude)
     {
         $url = "https://places.googleapis.com/v1/places:searchNearby";
         $body = '{    
@@ -47,21 +55,43 @@ class GmapsService
             "locationRestriction": {
                 "circle": {
                     "center": {
-                        "latitude": 52.3266004,
-                        "longitude": -0.6116101
+                        "latitude": ' . $latitude . ',
+                        "longitude": ' . $longitude . ',
                     },
                     "radius": 500.0
                 }
             }
         }';
         try {
-            $response = Http::withHeaders([
-                'Accept' => '*/*',
-                'Accept-Encoding' => 'gzip,deflate,br',
-                'Content-Type' => 'application/json',
-                'X-Goog-Api-Key' => $this->apiKey,
-                'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress'
-            ])->withBody($body, 'application/json')->post($url);
+            $response = Http::withHeaders($this->headers)
+                ->withBody($body, 'application/json')
+                ->post($url);
+
+            return $response->json();
+        } catch (\Exception $e) {
+            // Handle errors, log, etc.
+            return ['error' => 'Internal Server Error'];
+        }
+    }
+    public function getToilets($latitude, $longitude)
+    {
+        $url = "https://places.googleapis.com/v1/places:searchText";
+        $body = '{
+                    "textQuery": "toilet",
+                    "locationBias": {
+                        "circle": {
+                            "center": {
+                                "latitude": ' . $latitude . ',
+                                        "longitude": ' . $longitude . ',
+                            },
+                            "radius": 2000.0
+                        }
+                    }
+                }';
+        try {
+            $response = Http::withHeaders($this->headers)
+                ->withBody($body, 'application/json')
+                ->post($url);
 
             return $response->json();
         } catch (\Exception $e) {
