@@ -39,28 +39,29 @@ class GmapsService
             return ['error' => 'Internal Server Error'];
         }
     }
-    public function getNearbyPlaces($latitude, $longitude,  $radius, array $includedTypes)
+    public function getNearbyPlaces()
     {
         $url = "https://places.googleapis.com/v1/places:searchNearby";
-        $body = [
-            "locationRestriction" => [
-                "circle" => [
-                    "center" => [
-                        "latitude" => $latitude,
-                        "longitude" => $longitude
-                    ],
-                    "radius" => $radius
-                ]
-            ],
-            "rankPreference" => "DISTANCE", //sort the results
-            "includedTypes" => $includedTypes,
-        ];
+        $body = '{    
+            "maxResultCount": 10,
+            "locationRestriction": {
+                "circle": {
+                    "center": {
+                        "latitude": 52.3266004,
+                        "longitude": -0.6116101
+                    },
+                    "radius": 500.0
+                }
+            }
+        }';
         try {
             $response = Http::withHeaders([
+                'Accept' => '*/*',
+                'Accept-Encoding' => 'gzip,deflate,br',
                 'Content-Type' => 'application/json',
                 'X-Goog-Api-Key' => $this->apiKey,
-                'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress,places.delivery,places.id'
-            ])->post($url, array_merge($body));
+                'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress'
+            ])->withBody($body, 'application/json')->post($url);
 
             return $response->json();
         } catch (\Exception $e) {
