@@ -15,61 +15,55 @@ class GoogleMapsController extends Controller
         $this->gmapsService = $gmapsService;
     }
 
-    public function getNearbyPlacesOldControl(Request $request)
+    public function getNearbyPlacesControl(Request $request)
     {
         // Get the authenticated user
         $user = auth()->user(); // or $user = Auth::user();
 
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
-        $radius = $request->input('radius', 2500);
-        $location = $latitude . ',' . $longitude;
         $combinedPlaces = [];
+        $location = $latitude . ',' . $longitude;
         $type = $request->input('type');
 
         if ($type == "loo") {
-            // todo, enable user to add types
-            $keywords = ["mcdonalds", "asda", "sainsburys", "costa"];
-
-            foreach ($keywords as $keyword) {
-                $places = $this->gmapsService->getNearbyPlacesOld($location, $radius, "keyword", $keyword);
-
-                // Add distance data to each place
-                foreach ($places['results'] as &$place) {
-                    $distanceData = $this->gmapsService->getPlaceDistances($place['place_id'], $location);
-                    $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
-                }
-
-                // Merge the results into the combined array
-                $combinedPlaces = array_merge($combinedPlaces, $places['results']);
-            }
-        } else {
-            $type = "delivery"; // change this to the below request to find all that has food delivery
-            // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&place_id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
-
-
-            $places = $this->gmapsService->getNearbyPlacesOld($location, $radius, "keyword", $type);
+            $places = $this->gmapsService->getToilets($latitude, $longitude);
 
             // Add distance data to each place
-            foreach ($places['results'] as &$place) {
-                $distanceData = $this->gmapsService->getPlaceDistances($place['place_id'], $location);
+            foreach ($places['places'] as &$place) {
+                $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
+                $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
+            }
+
+            // Merge the results into the combined array
+            $combinedPlaces = array_merge($combinedPlaces, $places['places']);
+        } else {
+            $type = "delivery"; // change this to the below request to find all that has food delivery
+            // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
+
+
+            $places = $this->gmapsService->getNearbyPlacesOld($location, 2000, "keyword", $type);
+
+            // Add distance data to each place
+            foreach ($places['places']  as &$place) {
+                $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
                 $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
             }
 
             // Merge the results into the combined array
             $combinedPlaces = array_merge($combinedPlaces, $places['results']);
         }
-        // Remove duplicates based on coordinates
-        $filteredPlaces = $this->removeDuplicates($combinedPlaces);
+        // // Remove duplicates based on coordinates
+        // $filteredPlaces = $this->removeDuplicates($combinedPlaces);
 
-        // Sort the array by distance
-        usort($filteredPlaces, function ($a, $b) {
-            // Convert distance strings to meters for comparison
-            $distanceA = $this->convertDistanceToMeters($a['distance']);
-            $distanceB = $this->convertDistanceToMeters($b['distance']);
+        // // Sort the array by distance
+        // usort($filteredPlaces, function ($a, $b) {
+        //     // Convert distance strings to meters for comparison
+        //     $distanceA = $this->convertDistanceToMeters($a['distance']);
+        //     $distanceB = $this->convertDistanceToMeters($b['distance']);
 
-            return $distanceA <=> $distanceB;
-        });
+        //     return $distanceA <=> $distanceB;
+        // });
 
         if ($user instanceof User) {
             // increase the counter for the user
@@ -86,7 +80,7 @@ class GoogleMapsController extends Controller
                 'status' => 'success',
                 'message' => 'User updated successfully',
                 'userCounter' => $counter, // Return the updated user
-                'results' => $filteredPlaces
+                'results' => $combinedPlaces
             ]);
         } else {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -142,26 +136,15 @@ class GoogleMapsController extends Controller
 
         return 0; // Default to 0 if distance format is unexpected
     }
-    public function getNearbyPlacesControl(Request $request)
-    {
-        $latitude = $request->input('latitude');
-        $longitude = $request->input('longitude');
-        $radius = $request->input('radius', 500);
-        $type = $request->input('includedTypes');
+    // public function getNearbyPlacesControl(Request $request)
+    // {
+    //     $latitude = $request->input('latitude');
+    //     $longitude = $request->input('longitude');
 
-        $places = $this->gmapsService->getNearbyPlaces($latitude, $longitude);
+    //     $places = $this->gmapsService->mergeAndOrderResults($latitude, $longitude);
 
-        // Return the filtered places
-        return response()->json(['results' => $places]);
-    }
-    public function getToiletsControl(Request $request)
-    {
-        $latitude = $request->input('latitude');
-        $longitude = $request->input('longitude');
+    //     // Return the filtered places
+    //     return response()->json(['results' => $places]);
+    // }
 
-        $places = $this->gmapsService->getToilets($latitude, $longitude);
-
-        // Return the filtered places
-        return response()->json(['results' => $places]);
-    }
 }

@@ -18,7 +18,7 @@ class GmapsService
             'Accept-Encoding' => 'gzip,deflate,br',
             'Content-Type' => 'application/json',
             'X-Goog-Api-Key' => $this->apiKey,
-            'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress'
+            'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress,places.id'
         ];
     }
 
@@ -47,42 +47,19 @@ class GmapsService
             return ['error' => 'Internal Server Error'];
         }
     }
-    public function getNearbyPlaces($latitude, $longitude)
-    {
-        $url = "https://places.googleapis.com/v1/places:searchNearby";
-        $body = '{    
-            "maxResultCount": 10,
-            "locationRestriction": {
-                "circle": {
-                    "center": {
-                        "latitude": ' . $latitude . ',
-                        "longitude": ' . $longitude . ',
-                    },
-                    "radius": 500.0
-                }
-            }
-        }';
-        try {
-            $response = Http::withHeaders($this->headers)
-                ->withBody($body, 'application/json')
-                ->post($url);
-
-            return $response->json();
-        } catch (\Exception $e) {
-            // Handle errors, log, etc.
-            return ['error' => 'Internal Server Error'];
-        }
-    }
+   
     public function getToilets($latitude, $longitude)
     {
         $url = "https://places.googleapis.com/v1/places:searchText";
         $body = '{
-                    "textQuery": "toilet",
+                    "textQuery": "public toilet",
+                    "maxResultCount": 2,
+                    "rankPreference": "DISTANCE",
                     "locationBias": {
                         "circle": {
                             "center": {
                                 "latitude": ' . $latitude . ',
-                                        "longitude": ' . $longitude . ',
+                                "longitude": ' . $longitude . ',
                             },
                             "radius": 2000.0
                         }
@@ -98,5 +75,38 @@ class GmapsService
             // Handle errors, log, etc.
             return ['error' => 'Internal Server Error'];
         }
+    }
+    public function getMedicalCentres($latitude, $longitude)
+    {
+        $url = "https://places.googleapis.com/v1/places:searchText";
+        $body = '{
+                    "textQuery": "medical centre",
+                    "maxResultCount": 2,
+                    "rankPreference": "DISTANCE",
+                    "locationBias": {
+                        "circle": {
+                            "center": {
+                                "latitude": ' . $latitude . ',
+                                "longitude": ' . $longitude . ',
+                            },
+                            "radius": 2000.0
+                        }
+                    }
+                }';
+        try {
+            $response = Http::withHeaders($this->headers)
+                ->withBody($body, 'application/json')
+                ->post($url);
+
+            return $response->json();
+        } catch (\Exception $e) {
+            // Handle errors, log, etc.
+            return ['error' => 'Internal Server Error'];
+        }
+    }
+    public function mergeAndOrderResults($latitude, $longitude){
+        $resultToilets = $this->getToilets($latitude, $longitude);
+        $resultMedicalCentres = $this->getMedicalCentres($latitude, $longitude);
+        dd($resultMedicalCentres->json());
     }
 }
