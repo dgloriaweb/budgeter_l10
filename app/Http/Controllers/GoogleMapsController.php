@@ -17,7 +17,9 @@ class GoogleMapsController extends Controller
 
     public function getNearbyPlacesControl(Request $request)
     {
-        $textQueryArray = ["public toilet", "medical centre"];
+        // todo: change the array to add included types and excludetypes like tesco express
+        // "includedType":"store"
+        $textQueryArray = ["public toilet", "medical centre","mcdonalds","costa","starbucks","morrisons","sainsburys","waiterose"];
         // Get the authenticated user
         $user = auth()->user(); // or $user = Auth::user();
 
