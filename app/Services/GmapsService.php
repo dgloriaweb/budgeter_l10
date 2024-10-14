@@ -47,13 +47,13 @@ class GmapsService
             return ['error' => 'Internal Server Error'];
         }
     }
-   
-    public function getToilets($latitude, $longitude)
+
+    public function searchTextNewApi($latitude, $longitude, $textQuery, $maxResultCount)
     {
         $url = "https://places.googleapis.com/v1/places:searchText";
         $body = '{
-                    "textQuery": "public toilet",
-                    "maxResultCount": 2,
+                    "textQuery": "' . $textQuery . '",
+                    "maxResultCount": ' . $maxResultCount . ',
                     "rankPreference": "DISTANCE",
                     "locationBias": {
                         "circle": {
@@ -75,38 +75,5 @@ class GmapsService
             // Handle errors, log, etc.
             return ['error' => 'Internal Server Error'];
         }
-    }
-    public function getMedicalCentres($latitude, $longitude)
-    {
-        $url = "https://places.googleapis.com/v1/places:searchText";
-        $body = '{
-                    "textQuery": "medical centre",
-                    "maxResultCount": 2,
-                    "rankPreference": "DISTANCE",
-                    "locationBias": {
-                        "circle": {
-                            "center": {
-                                "latitude": ' . $latitude . ',
-                                "longitude": ' . $longitude . ',
-                            },
-                            "radius": 2000.0
-                        }
-                    }
-                }';
-        try {
-            $response = Http::withHeaders($this->headers)
-                ->withBody($body, 'application/json')
-                ->post($url);
-
-            return $response->json();
-        } catch (\Exception $e) {
-            // Handle errors, log, etc.
-            return ['error' => 'Internal Server Error'];
-        }
-    }
-    public function mergeAndOrderResults($latitude, $longitude){
-        $resultToilets = $this->getToilets($latitude, $longitude);
-        $resultMedicalCentres = $this->getMedicalCentres($latitude, $longitude);
-        dd($resultMedicalCentres->json());
     }
 }

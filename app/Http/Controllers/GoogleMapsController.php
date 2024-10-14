@@ -27,7 +27,23 @@ class GoogleMapsController extends Controller
         $type = $request->input('type');
 
         if ($type == "loo") {
-            $places = $this->gmapsService->getToilets($latitude, $longitude);
+            // we need to do separate requests for different types.
+            // find toilets
+            $textQuery = "public toilet";
+            $maxResultCount = 2;
+            // here we will have to do many requests, and merge them together
+            $places1 = $this->gmapsService->searchTextNewApi($latitude, $longitude, $textQuery, $maxResultCount);
+            // find medical centres
+            $textQuery = "medical centre";
+            $maxResultCount = 2;
+            // here we will have to do many requests, and merge them together
+            $places2 = $this->gmapsService->searchTextNewApi($latitude, $longitude, $textQuery, $maxResultCount);
+            // todo: add restaurants, cafes and shopping malls
+            array_push($places1['places'], $places2);
+            dd($places1);
+
+            //merge the results
+
 
             // Add distance data to each place
             foreach ($places['places'] as &$place) {
