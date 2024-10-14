@@ -18,7 +18,7 @@ class GmapsService
             'Accept-Encoding' => 'gzip,deflate,br',
             'Content-Type' => 'application/json',
             'X-Goog-Api-Key' => $this->apiKey,
-            'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress,places.id'
+            'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress,places.id,places.restroom,places.location'
         ];
     }
 
