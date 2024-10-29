@@ -33,7 +33,7 @@ class GoogleMapsController extends Controller
         // we need to do separate requests for different types.
         if ($type == "loo") {
             foreach ($textQueryArray as $textQuery) {
-                $maxResultCount = 2;
+                $maxResultCount = 5;
                 // here we will have to do many requests, and merge them together
                 $resultset = $this->gmapsService->searchTextNewApi($latitude, $longitude, $textQuery, $maxResultCount);
                 foreach ($resultset['places'] as $resultitem) {
@@ -47,20 +47,18 @@ class GoogleMapsController extends Controller
                 $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
             }
         } else if ($type == "delivery") {
-            $maxResultCount = 10;
-            // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
+            $maxResultCount = 30;
             $resultset = $this->gmapsService->searchTextNewApi($latitude, $longitude, $type, $maxResultCount);
             foreach ($resultset['places'] as $resultitem) {
                 array_push($places, $resultitem);
             }
+
+            // Add distance data to each place
+            foreach ($places as &$place) {
+                $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
+                $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
+            }
             return $places;
-
-            //     $places = $this->gmapsService->getNearbyPlacesOld($location, 2000, "keyword", $type);
-
-            //     // Add distance data to each place
-            //     foreach ($places['places']  as &$place) {
-            //         $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
-            //         $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
         }
 
         usort($places, function ($a, $b) {
