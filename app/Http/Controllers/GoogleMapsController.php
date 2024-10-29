@@ -58,7 +58,6 @@ class GoogleMapsController extends Controller
                 $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
                 $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
             }
-            return $places;
         }
 
         usort($places, function ($a, $b) {
