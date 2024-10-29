@@ -19,7 +19,7 @@ class GoogleMapsController extends Controller
     {
         // todo: change the array to add included types and excludetypes like tesco express
         // "includedType":"store"
-        $textQueryArray = ["public toilet", "medical centre","mcdonalds","costa","starbucks","morrisons","sainsburys","waiterose"];
+        $textQueryArray = ["public toilet", "medical centre", "mcdonalds", "costa", "starbucks", "morrisons", "sainsburys", "waiterose"];
         // Get the authenticated user
         $user = auth()->user(); // or $user = Auth::user();
 
@@ -29,35 +29,39 @@ class GoogleMapsController extends Controller
         $location = $latitude . ',' . $longitude;
         $type = $request->input('type');
         $places = [];
-        // if ($type == "loo") {
+
         // we need to do separate requests for different types.
-        foreach ($textQueryArray as $textQuery) {
-            $maxResultCount = 2;
-            // here we will have to do many requests, and merge them together
-            $resultset = $this->gmapsService->searchTextNewApi($latitude, $longitude, $textQuery, $maxResultCount);
-            foreach ($resultset['places'] as $resultitem){
+        if ($type == "loo") {
+            foreach ($textQueryArray as $textQuery) {
+                $maxResultCount = 2;
+                // here we will have to do many requests, and merge them together
+                $resultset = $this->gmapsService->searchTextNewApi($latitude, $longitude, $textQuery, $maxResultCount);
+                foreach ($resultset['places'] as $resultitem) {
+                    array_push($places, $resultitem);
+                }
+            }
+            // dd($places);
+            // Add distance data to each place
+            foreach ($places as &$place) {
+                $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
+                $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
+            }
+        } else if ($type == "delivery") {
+            $maxResultCount = 10;
+            // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
+            $resultset = $this->gmapsService->searchTextNewApi($latitude, $longitude, $type, $maxResultCount);
+            foreach ($resultset['places'] as $resultitem) {
                 array_push($places, $resultitem);
             }
+            return $places;
+
+            //     $places = $this->gmapsService->getNearbyPlacesOld($location, 2000, "keyword", $type);
+
+            //     // Add distance data to each place
+            //     foreach ($places['places']  as &$place) {
+            //         $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
+            //         $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
         }
-        // dd($places);
-        // Add distance data to each place
-        foreach ($places as &$place) {
-            $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
-            $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
-        }
-
-        // } else {
-        //     $type = "delivery"; // change this to the below request to find all that has food delivery
-        //     // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
-
-
-        //     $places = $this->gmapsService->getNearbyPlacesOld($location, 2000, "keyword", $type);
-
-        //     // Add distance data to each place
-        //     foreach ($places['places']  as &$place) {
-        //         $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
-        //         $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
-        //     }
 
         usort($places, function ($a, $b) {
             // Convert distance strings to meters for comparison
@@ -89,7 +93,7 @@ class GoogleMapsController extends Controller
             // Return the updated user data
             return response()->json([
                 'status' => 'success',
-                'message' => 'User updated successfully',
+                'message' => 'User patreon counter updated successfully',
                 'userCounter' => $counter, // Return the updated user
                 'results' => $uniquePlaces
             ]);
