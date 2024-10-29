@@ -96,7 +96,6 @@ class GoogleMapsController extends Controller
         } else {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
-        return $uniquePlaces;
     }
 
     private function removeDuplicates($placesArray)

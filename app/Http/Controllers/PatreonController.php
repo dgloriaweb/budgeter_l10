@@ -152,7 +152,7 @@ class PatreonController extends Controller
     public function resetPatreonCounter()
     {
         User::whereNotNull('patreon_code')
-            ->where('patreon_code', '!=', '')
+            ->where('patreon_code', '<>', '""')
             ->where('patreon_daily_counter', '>', 0)
             ->update(['patreon_daily_counter' => 0]);
         // Log a message to verify the method is being called
