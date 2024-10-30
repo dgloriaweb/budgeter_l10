@@ -53,11 +53,12 @@ class UserPartnerController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Request
      */
-    public function getuserpartners($user_id)
+    public function getuserpartners(Request $request)
     {
-        $dataById = User::with('partners')->where('id', $user_id)
+        $user = auth()->user(); 
+        $dataById = User::with('partners')->where('id', $user->id)
             ->whereHas('partners', function ($query) {
                 $query->where('enabled', 1);
             })
