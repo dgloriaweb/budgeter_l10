@@ -17,59 +17,65 @@ class GoogleMapsController extends Controller
 
     public function getNearbyPlacesControl(Request $request)
     {
+        // todo: change the array to add included types and excludetypes like tesco express
+        // "includedType":"store"
+        $textQueryArray = ["public toilet", "medical centre", "mcdonalds", "costa", "starbucks", "morrisons", "sainsburys", "waiterose"];
         // Get the authenticated user
         $user = auth()->user(); // or $user = Auth::user();
 
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
-        $radius = $request->input('radius', 2500);
-        $location = $latitude . ',' . $longitude;
         $combinedPlaces = [];
+        $location = $latitude . ',' . $longitude;
         $type = $request->input('type');
+        $places = [];
 
+        // we need to do separate requests for different types.
         if ($type == "loo") {
-            // todo, enable user to add types
-            $keywords = ["mcdonalds", "asda", "sainsburys", "costa"];
-
-            foreach ($keywords as $keyword) {
-                $places = $this->gmapsService->getNearbyPlaces($location, $radius, "keyword", $keyword);
-
-                // Add distance data to each place
-                foreach ($places['results'] as &$place) {
-                    $distanceData = $this->gmapsService->getPlaceDistances($place['place_id'], $location);
-                    $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
+            foreach ($textQueryArray as $textQuery) {
+                $maxResultCount = 5;
+                // here we will have to do many requests, and merge them together
+                $resultset = $this->gmapsService->searchTextNewApi($latitude, $longitude, $textQuery, $maxResultCount);
+                foreach ($resultset['places'] as $resultitem) {
+                    array_push($places, $resultitem);
                 }
-
-                // Merge the results into the combined array
-                $combinedPlaces = array_merge($combinedPlaces, $places['results']);
             }
-        } else {
-            $type = "delivery"; // change this to the below request to find all that has food delivery
-            // https://maps.googleapis.com/maps/api/place/details/json?key=<key>&place_id=ChIJ3Q1tAkdVdkgRnKZ4Td8bVFk&fields=name,opening_hours,delivery,takeout
-
-
-            $places = $this->gmapsService->getNearbyPlaces($location, $radius, "keyword", $type);
-
+            // dd($places);
             // Add distance data to each place
-            foreach ($places['results'] as &$place) {
-                $distanceData = $this->gmapsService->getPlaceDistances($place['place_id'], $location);
+            foreach ($places as &$place) {
+                $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
                 $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
             }
+        } else if ($type == "delivery") {
+            $maxResultCount = 30;
+            $resultset = $this->gmapsService->searchTextNewApi($latitude, $longitude, $type, $maxResultCount);
+            foreach ($resultset['places'] as $resultitem) {
+                array_push($places, $resultitem);
+            }
 
-            // Merge the results into the combined array
-            $combinedPlaces = array_merge($combinedPlaces, $places['results']);
+            // Add distance data to each place
+            foreach ($places as &$place) {
+                $distanceData = $this->gmapsService->getPlaceDistances($place['id'], $location);
+                $place['distance'] = $distanceData['rows'][0]['elements'][0]['distance']['text'] ?? null;
+            }
         }
-        // Remove duplicates based on coordinates
-        $filteredPlaces = $this->removeDuplicates($combinedPlaces);
 
-        // Sort the array by distance
-        usort($filteredPlaces, function ($a, $b) {
+        usort($places, function ($a, $b) {
             // Convert distance strings to meters for comparison
             $distanceA = $this->convertDistanceToMeters($a['distance']);
             $distanceB = $this->convertDistanceToMeters($b['distance']);
 
             return $distanceA <=> $distanceB;
         });
+        // // Merge the results into the combined array
+        // $combinedPlaces = array_merge($combinedPlaces, $places['results']);
+        // }
+        // // Remove duplicates based on coordinates
+        // $filteredPlaces = $this->removeDuplicates($combinedPlaces);
+
+        // Output the URL
+        $uniquePlaces = $this->removeDuplicates($places);
+
 
         if ($user instanceof User) {
             // increase the counter for the user
@@ -84,9 +90,9 @@ class GoogleMapsController extends Controller
             // Return the updated user data
             return response()->json([
                 'status' => 'success',
-                'message' => 'User updated successfully',
+                'message' => 'User patreon counter updated successfully',
                 'userCounter' => $counter, // Return the updated user
-                'results' => $filteredPlaces
+                'results' => $uniquePlaces
             ]);
         } else {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -98,11 +104,11 @@ class GoogleMapsController extends Controller
         $uniquePlaces = [];
 
         foreach ($placesArray as $place) {
-            $coordinates = $place['geometry']['location'];
+            $coordinates = $place['location'];
 
             // Check if a place with similar coordinates already exists
             $existingPlace = array_values(array_filter($uniquePlaces, function ($p) use ($coordinates) {
-                return $this->areCoordinatesSimilar($p['geometry']['location'], $coordinates);
+                return $this->areCoordinatesSimilar($p['location'], $coordinates);
             }));
 
             // If no matching place is found, add the current place to the unique list
@@ -116,11 +122,11 @@ class GoogleMapsController extends Controller
 
     private function areCoordinatesSimilar($coord1, $coord2, $decimalPrecision = 3)
     {
-        $lat1 = round($coord1['lat'], $decimalPrecision);
-        $lng1 = round($coord1['lng'], $decimalPrecision);
+        $lat1 = round($coord1['latitude'], $decimalPrecision);
+        $lng1 = round($coord1['longitude'], $decimalPrecision);
 
-        $lat2 = round($coord2['lat'], $decimalPrecision);
-        $lng2 = round($coord2['lng'], $decimalPrecision);
+        $lat2 = round($coord2['latitude'], $decimalPrecision);
+        $lng2 = round($coord2['longitude'], $decimalPrecision);
 
         return ($lat1 == $lat2) && ($lng1 == $lng2);
     }
@@ -142,4 +148,15 @@ class GoogleMapsController extends Controller
 
         return 0; // Default to 0 if distance format is unexpected
     }
+    // public function getNearbyPlacesControl(Request $request)
+    // {
+    //     $latitude = $request->input('latitude');
+    //     $longitude = $request->input('longitude');
+
+    //     $places = $this->gmapsService->mergeAndOrderResults($latitude, $longitude);
+
+    //     // Return the filtered places
+    //     return response()->json(['results' => $places]);
+    // }
+
 }
