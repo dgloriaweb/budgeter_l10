@@ -19,7 +19,7 @@ class GoogleMapsController extends Controller
     {
         // todo: change the array to add included types and excludetypes like tesco express
         // "includedType":"store"
-        $textQueryArray = ["public toilet", "medical centre", "mcdonalds", "costa", "starbucks", "morrisons", "sainsburys", "waiterose"];
+        $textQueryArray = ["public toilet", "medical centre", "mcdonalds", "costa", "starbucks", "morrisons", "sainsbury", "waiterose","supermarket"];
         // Get the authenticated user
         $user = auth()->user(); // or $user = Auth::user();
 
