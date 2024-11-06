@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partner;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PartnerController extends Controller
@@ -16,6 +17,22 @@ class PartnerController extends Controller
     {
         $partners = Partner::where('enabled', 1)->get();
         return $partners;
+    }
+
+    // get partners of users
+    public function userpartners()
+    {
+        // $userpartners = Partner::with('users')->where('enabled', 1)->get();
+        $userpartners = User::whereHas('partners', fn($query) => $query->where('enabled', 1))->with('partners')->get();
+        // $userpartners = User::with('partners')->where('enabled', 1)->get();
+        return $userpartners;
+    }
+
+    // get all partners that aren't related to user
+    public function notuserpartners()
+    {
+        $notuserpartners = Partner::whereDoesntHave('users')->get();
+        return $notuserpartners;
     }
 
     /**
