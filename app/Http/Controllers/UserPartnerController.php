@@ -58,11 +58,12 @@ class UserPartnerController extends Controller
     public function getuserpartners(Request $request)
     {
         $user = auth()->user(); 
-        $dataById = User::with('partners')->where('id', $user->id)
-            ->whereHas('partners', function ($query) {
-                $query->where('enabled', 1);
-            })
-            ->get();
+        $dataById = Partner::where('enabled', 1) // Check partners.enabled
+        ->whereHas('users', function ($query) use ($user) {
+            $query->where('user_id', $user->id) // Linked to authenticated user
+                  ->where('user_partner.enabled', 1); // Check user_partner.enabled
+        })
+        ->get();
         return $dataById;
     }
 
