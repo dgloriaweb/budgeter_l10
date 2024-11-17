@@ -87,17 +87,15 @@ class UserPartnerController extends Controller
      */
     public function update(Request $request)
     {
+        $user = auth()->user(); // or $user = Auth::user();
         $validated = $request->validate([
-            'partner_id' => 'required|integer',
-            'enabled' => 'required|integer'
+            'partner_id' => 'required|integer'
         ]);
         // Get the authenticated user
-        $user = auth()->user(); // or $user = Auth::user();
 
         $userpartner =  UserPartner::where('user_id', $user->id)
             ->where('partner_id', $request->partner_id)
             ->first();
-
 
         // if there is a result, update the enabled to 1
         if ($userpartner) {
@@ -117,19 +115,19 @@ class UserPartnerController extends Controller
      */
     public function create($request)
     {
+        
+        $user = auth()->user(); // or $user = Auth::user();
         // check if the partner id exists
         $partner = Partner::find($request->partner_id);
         if ($partner) {
 
             $validated = $request->validate([
-                'user_id' => 'required|integer',
-                'partner_id' => 'required|integer',
-                'enabled' => 'required|integer'
+                'partner_id' => 'required|integer'
             ]);
             $userpartner = new UserPartner();
-            $userpartner->user_id = $request->user_id;
+            $userpartner->user_id = $user->id;
             $userpartner->partner_id = $request->partner_id;
-            $userpartner->enabled = $request->enabled;
+            $userpartner->enabled = 1;
             $userpartner->save();
         } else {
             return response()->json(['message' => 'this partner id doesn\'t exist'], 500);
