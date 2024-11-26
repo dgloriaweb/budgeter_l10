@@ -106,6 +106,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/userpartners/{id}', 'App\Http\Controllers\UserPartnerController@show')->name('userpartners');
     Route::get('/getuserpartners', 'App\Http\Controllers\UserPartnerController@getuserpartners')->name('getuserpartners');
     Route::post('/userpartner', 'App\Http\Controllers\UserPartnerController@update')->name('setuserpartner');
-    // Route::post('/enableuserpartner/{partner_id}', 'App\Http\Controllers\UserPartnerController@enable')->name('enableuserpartner');
+    Route::post('/disableuserpartner', 'App\Http\Controllers\UserPartnerController@disable')->name('disableuserpartner');
+    Route::post('/enableuserpartner', 'App\Http\Controllers\UserPartnerController@enable')->name('enableuserpartner');
 
 });
