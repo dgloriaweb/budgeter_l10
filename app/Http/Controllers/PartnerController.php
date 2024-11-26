@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Partner;
 use App\Models\User;
+use App\Models\UserPartner;
 use Illuminate\Http\Request;
 
 class PartnerController extends Controller
@@ -29,9 +30,16 @@ class PartnerController extends Controller
     }
 
     // get all partners that aren't related to user
-    public function notuserpartners()
+    public function nonuserpartners()
     {
-        $notuserpartners = Partner::whereDoesntHave('users')->get();
+        // Get all partner IDs linked to users with enabled = 1
+        $linkedPartnerIds = UserPartner::where('enabled', 1)
+            ->pluck('partner_id')
+            ->toArray();
+
+        // Get all partners excluding those with enabled = 1
+        $notuserpartners = Partner::whereNotIn('id', $linkedPartnerIds)->get();
+
         return $notuserpartners;
     }
 
@@ -40,9 +48,7 @@ class PartnerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
-    }
+    public function create(Request $request) {}
 
     /**
      * Store a newly created resource in storage.
@@ -55,7 +61,7 @@ class PartnerController extends Controller
         $validated = $request->validate([
             'partner' => 'required|string|max:255',
         ]);
-        
+
         $request->partners()->create($validated);
     }
 

@@ -100,7 +100,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/mileage_report/{id}', 'App\Http\Controllers\MileageController@report')->name('mileages_report');
     Route::get('/partners', 'App\Http\Controllers\PartnerController@index')->name('partners');
     Route::get('/userpartners', 'App\Http\Controllers\PartnerController@userpartners')->name('userpartners');
-    Route::get('/notuserpartners', 'App\Http\Controllers\PartnerController@notuserpartners')->name('notuserpartners');
+    Route::get('/nonuserpartners', 'App\Http\Controllers\PartnerController@nonuserpartners')->name('nonuserpartners');
     Route::post('/partners', 'App\Http\Controllers\PartnerController@store');
     Route::get('/locations', 'App\Http\Controllers\LocationController@index')->name('locations');
     Route::get('/userpartners/{id}', 'App\Http\Controllers\UserPartnerController@show')->name('userpartners');
