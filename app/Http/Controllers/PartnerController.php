@@ -32,14 +32,19 @@ class PartnerController extends Controller
     // get all partners that aren't related to user
     public function nonuserpartners()
     {
-        // Get all partner IDs linked to users with enabled = 1
-        $linkedPartnerIds = UserPartner::where('enabled', 1)
-            ->pluck('partner_id')
-            ->toArray();
-
-        // Get all partners excluding those with enabled = 1
-        $notuserpartners = Partner::whereNotIn('id', $linkedPartnerIds)->get();
-
+        $user = auth()->user(); // Current authenticated user
+        $userId = $user->id;
+    
+        // Step 1: Get all partner IDs linked to the user with enabled = 1
+        $linkedPartnerIds = UserPartner::where('user_id', $userId)
+            ->where('enabled', 1)
+            ->pluck('partner_id');
+    
+        // Step 2: Get all partners where `enabled != 0` and exclude linked partner IDs
+        $notuserpartners = Partner::where('enabled', '!=', 0)
+            ->whereNotIn('id', $linkedPartnerIds)
+            ->get();
+    
         return $notuserpartners;
     }
 
