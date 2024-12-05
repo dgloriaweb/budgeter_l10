@@ -17,6 +17,7 @@ class CreateUserPartnerTable extends Migration
             $table->id();
             $table->smallInteger('user_id');
             $table->smallInteger('partner_id');
+            $table->tinyInteger('enabled')->default(1);
             $table->timestamps();
         });
     }
