@@ -44,26 +44,27 @@ class ApiAuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
         if ($validator->fails()) {
-            return response(['errors' => $validator->errors()->all()], 422);
-        }
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            if (Hash::check($request->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                return response([
-                    'token' => $token,
-                    'userId' => $user->id,
-                    'successMessage' => "User successfully logged in",
-                    'patreon_code' => $user->patreon_code,
-                    'patreon_expiry_date' => $user->patreon_expiry_date,
-                    'patreon_daily_counter' => $user->patreon_daily_counter,
-
-                ], 200);
-            } else {
-                return response(['errors' => "Password mismatch"], 422);
-            }
+            return response(['errors' => $validator->errors()->all()]);
         } else {
-            return response(['errors' => "User doesn't exist"], 422);
+            $user = User::where('email', $request->email)->first();
+            if ($user) {
+                if (Hash::check($request->password, $user->password)) {
+                    $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                    return response([
+                        'token' => $token,
+                        'userId' => $user->id,
+                        'successMessage' => "User successfully logged in",
+                        'patreon_code' => $user->patreon_code,
+                        'patreon_expiry_date' => $user->patreon_expiry_date,
+                        'patreon_daily_counter' => $user->patreon_daily_counter,
+
+                    ], 200);
+                } else {
+                    return response(['errors' => "Password mismatch"], 401);
+                }
+            } else {
+                return response(['errors' => "User doesn't exist"], 401);
+            }
         }
     }
 
@@ -77,7 +78,7 @@ class ApiAuthController extends Controller
     {
         $user = User::find($id);
         if (!$user) {
-            return response()->json(['message' => 'Invalid user'], 404);
+            return response()->json(['message' => 'Invalid user'], 401);
         }
         if (!hash_equals($hash, sha1($user->getEmailForVerification()))) {
             return response()->json(['message' => 'Invalid verification link'], 401);
