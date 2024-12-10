@@ -16,7 +16,8 @@ class UserPartner extends Model
 
     protected $fillable = [
         'user_id',
-        'partner_id'
+        'partner_id',
+        'enabled'
     ];
 
    

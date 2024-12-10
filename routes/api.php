@@ -99,11 +99,14 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/mileages/{id}', 'App\Http\Controllers\MileageController@update');
     Route::get('/mileage_report/{id}', 'App\Http\Controllers\MileageController@report')->name('mileages_report');
     Route::get('/partners', 'App\Http\Controllers\PartnerController@index')->name('partners');
+    Route::get('/userpartners', 'App\Http\Controllers\PartnerController@userpartners')->name('userpartners');
+    Route::get('/nonuserpartners', 'App\Http\Controllers\PartnerController@nonuserpartners')->name('nonuserpartners');
     Route::post('/partners', 'App\Http\Controllers\PartnerController@store');
     Route::get('/locations', 'App\Http\Controllers\LocationController@index')->name('locations');
     Route::get('/userpartners/{id}', 'App\Http\Controllers\UserPartnerController@show')->name('userpartners');
-    Route::get('/getuserpartners/{user_id}', 'App\Http\Controllers\UserPartnerController@getuserpartners')->name('getuserpartners');
+    Route::get('/getuserpartners', 'App\Http\Controllers\UserPartnerController@getuserpartners')->name('getuserpartners');
     Route::post('/userpartner', 'App\Http\Controllers\UserPartnerController@update')->name('setuserpartner');
-    // Route::post('/enableuserpartner/{partner_id}', 'App\Http\Controllers\UserPartnerController@enable')->name('enableuserpartner');
+    Route::post('/disableuserpartner', 'App\Http\Controllers\UserPartnerController@disable')->name('disableuserpartner');
+    Route::post('/enableuserpartner', 'App\Http\Controllers\UserPartnerController@enable')->name('enableuserpartner');
 
 });
