@@ -16,3 +16,6 @@ Laravel was outdated. Need to rewrite that bit again
 ## milestones
 dailydriver.info went live in 2024 with a Patreon subscription option
 Still need to provide some free services
+
+### my google api keys
+https://console.cloud.google.com/
